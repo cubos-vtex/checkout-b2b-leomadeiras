@@ -1,5 +1,5 @@
 import { NotFoundError, ResolverError, ServiceContext } from '@vtex/api'
-import { MutationPlaceOrderArgs } from 'ssesandbox04.checkout-b2b'
+import { MutationPlaceOrderArgs } from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../../clients'
 import {

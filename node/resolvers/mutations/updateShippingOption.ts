@@ -1,5 +1,5 @@
 import { NotFoundError, ServiceContext } from '@vtex/api'
-import { MutationUpdateShippingOptionArgs } from 'ssesandbox04.checkout-b2b'
+import { MutationUpdateShippingOptionArgs } from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../../clients'
 import { getSessionData, handleCheckoutApiError } from '../../utils'

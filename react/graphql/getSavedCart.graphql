@@ -1,5 +1,5 @@
 query getSavedCart($id: ID!) {
-  getCart(id: $id) @context(provider: "ssesandbox04.checkout-b2b") {
+  getCart(id: $id) @context(provider: "ssesandbox04.checkout-b2b-leomadeiras") {
     id
     createdIn
     lastInteractionIn

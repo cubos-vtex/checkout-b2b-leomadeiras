@@ -1,4 +1,4 @@
 mutation PlaceOrder($poNumber: String, $invoiceData: InvoiceData) {
   placeOrder(poNumber: $poNumber, invoiceData: $invoiceData)
-    @context(provider: "ssesandbox04.checkout-b2b")
+    @context(provider: "ssesandbox04.checkout-b2b-leomadeiras")
 }

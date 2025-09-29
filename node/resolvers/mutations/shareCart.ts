@@ -1,5 +1,5 @@
 import { ServiceContext } from '@vtex/api'
-import type { MutationShareCartArgs } from 'ssesandbox04.checkout-b2b'
+import type { MutationShareCartArgs } from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../../clients'
 import { cartSharedMessage } from '../../mail-templates/cartShared'

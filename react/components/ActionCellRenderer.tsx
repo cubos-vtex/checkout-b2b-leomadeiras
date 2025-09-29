@@ -1,6 +1,6 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
-import type { SavedCart } from 'ssesandbox04.checkout-b2b'
+import type { SavedCart } from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { ButtonWithIcon, IconShoppingCart, Tooltip } from 'vtex.styleguide'
 
 import { useCheckoutB2BContext } from '../CheckoutB2BContext'

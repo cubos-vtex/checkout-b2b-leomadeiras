@@ -2,7 +2,10 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import { useIntl } from 'react-intl'
-import { Mutation, MutationUpdatePricesArgs } from 'ssesandbox04.checkout-b2b'
+import {
+  Mutation,
+  MutationUpdatePricesArgs,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 import 'vtex.country-codes/locales'
 import { useCssHandles } from 'vtex.css-handles'
 import { ExtensionPoint, useRuntime } from 'vtex.render-runtime'

@@ -1,5 +1,5 @@
 import { ServiceContext } from '@vtex/api'
-import { QueryGetRepresentativeBalanceTransactionsArgs } from 'ssesandbox04.checkout-b2b'
+import { QueryGetRepresentativeBalanceTransactionsArgs } from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../../clients'
 import {

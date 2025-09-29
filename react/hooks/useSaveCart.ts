@@ -1,7 +1,10 @@
 import { useCallback } from 'react'
 import { useMutation } from 'react-apollo'
 import { useIntl } from 'react-intl'
-import type { Mutation, MutationSaveCartArgs } from 'ssesandbox04.checkout-b2b'
+import type {
+  Mutation,
+  MutationSaveCartArgs,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { useRuntime } from 'vtex.render-runtime'
 
 import { useOrderFormCustom, useToast } from '.'

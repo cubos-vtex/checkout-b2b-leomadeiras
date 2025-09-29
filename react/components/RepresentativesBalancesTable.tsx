@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery } from 'react-apollo'
 import { useIntl } from 'react-intl'
-import { Query, RepresentativeBalance } from 'ssesandbox04.checkout-b2b'
+import {
+  Query,
+  RepresentativeBalance,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { useRuntime } from 'vtex.render-runtime'
 import {
   QueryListUsersArgs,

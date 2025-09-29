@@ -1,5 +1,8 @@
 import { ServiceContext } from '@vtex/api'
-import type { MutationSaveCartArgs, SavedCart } from 'ssesandbox04.checkout-b2b'
+import type {
+  MutationSaveCartArgs,
+  SavedCart,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../../clients'
 import {

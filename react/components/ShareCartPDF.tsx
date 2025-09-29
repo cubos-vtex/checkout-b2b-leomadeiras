@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import { useIntl } from 'react-intl'
-import { Mutation, MutationShareCartArgs } from 'ssesandbox04.checkout-b2b'
+import {
+  Mutation,
+  MutationShareCartArgs,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { B2BUser } from 'vtex.b2b-organizations-graphql'
 import { useCssHandles } from 'vtex.css-handles'
 import { useRuntime } from 'vtex.render-runtime'

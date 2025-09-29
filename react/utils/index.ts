@@ -115,9 +115,9 @@ export function transformImageUrl(
 export function welcome() {
   console.info(`
 
-=========================================
-WELCOME TO CHECKOUT B2B | VERSION: ${process.env.VTEX_APP_VERSION}
-=========================================
+==========================================================
+WELCOME TO CHECKOUT B2B FOR LEO MADEIRAS | VERSION: ${process.env.VTEX_APP_VERSION}
+==========================================================
 
 `)
 }

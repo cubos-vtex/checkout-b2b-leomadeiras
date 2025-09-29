@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import { useQuery } from 'react-apollo'
 import { useIntl } from 'react-intl'
-import { MutationUpdateItemsQuantityArgs } from 'ssesandbox04.checkout-b2b'
+import { MutationUpdateItemsQuantityArgs } from 'ssesandbox04.checkout-b2b-leomadeiras'
 import {
   AutocompleteInput,
   ButtonWithIcon,

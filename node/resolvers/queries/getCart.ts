@@ -1,5 +1,8 @@
 import { ServiceContext } from '@vtex/api'
-import type { QueryGetCartArgs, SavedCart } from 'ssesandbox04.checkout-b2b'
+import type {
+  QueryGetCartArgs,
+  SavedCart,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../../clients'
 import { SAVED_CART_ENTITY, SAVED_CART_FIELDS } from '../../utils'

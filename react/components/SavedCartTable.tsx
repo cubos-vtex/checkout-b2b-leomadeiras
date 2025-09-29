@@ -6,7 +6,7 @@ import type {
   MutationSaveCartArgs,
   MutationUpdatePricesArgs,
   SavedCart,
-} from 'ssesandbox04.checkout-b2b'
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { CustomData, Item } from 'vtex.checkout-graphql'
 import type {
   SelectDeliveryOptionMutation,
