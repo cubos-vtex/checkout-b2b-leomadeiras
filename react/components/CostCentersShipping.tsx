@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl'
 import type {
   Mutation,
   MutationAddAddressToCartArgs,
-} from 'ssesandbox04.checkout-b2b'
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { AddressType } from 'vtex.checkout-graphql'
 import { useCssHandles } from 'vtex.css-handles'
 import type { Address as StoreGraphqlAddress } from 'vtex.store-graphql'

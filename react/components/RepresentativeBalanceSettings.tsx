@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl'
 import {
   Mutation,
   MutationSaveRepresentativeBalanceSettingsArgs,
-} from 'ssesandbox04.checkout-b2b'
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { useRuntime } from 'vtex.render-runtime'
 import {
   Button,

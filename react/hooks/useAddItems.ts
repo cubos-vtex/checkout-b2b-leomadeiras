@@ -1,5 +1,8 @@
 import { useMutation } from 'react-apollo'
-import { Mutation, MutationAddItemsToCartArgs } from 'ssesandbox04.checkout-b2b'
+import {
+  Mutation,
+  MutationAddItemsToCartArgs,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { useToast } from '.'
 import MUTATION_ADD_TO_CART from '../graphql/addItemsToCart.graphql'

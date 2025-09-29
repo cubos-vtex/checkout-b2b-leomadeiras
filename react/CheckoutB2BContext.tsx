@@ -4,7 +4,7 @@ import type {
   Query,
   QueryGetCartArgs,
   SavedCart,
-} from 'ssesandbox04.checkout-b2b'
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 import type { Item } from 'vtex.checkout-graphql'
 import { useRuntime } from 'vtex.render-runtime'
 import { withToast } from 'vtex.styleguide'

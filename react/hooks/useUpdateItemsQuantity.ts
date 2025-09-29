@@ -2,7 +2,7 @@ import { useMutation } from 'react-apollo'
 import {
   Mutation,
   MutationUpdateItemsQuantityArgs,
-} from 'ssesandbox04.checkout-b2b'
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import UPDATE_ITEMS_QUANTITY_MUTATION from '../graphql/updateItemsQuantity.graphql'
 import { useOrderFormCustom } from './useOrderFormCustom'

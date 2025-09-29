@@ -7,6 +7,7 @@ import {
   useFormatPrice,
   useOrderFormCustom,
   usePermissions,
+  useProducts,
   useTaxes,
   useTotalMargin,
 } from '.'
@@ -34,6 +35,7 @@ export function useTotalizers() {
 
   const { totalMargin } = useTotalMargin()
   const prevMarginRef = useRef(totalMargin)
+  const { data: productsData } = useProducts()
 
   useEffect(() => {
     if (!totalMargin) return
@@ -66,8 +68,6 @@ export function useTotalizers() {
     })
   }
 
-  if (!totalizers.length || !items?.length) return []
-
   const totalItemsWithoutDiscount =
     totalizers.find((t) => t.id === 'Items')?.value ?? 0
 
@@ -81,6 +81,30 @@ export function useTotalizers() {
   )
 
   const totalDiscount = Math.round(percentualDiscount + discountApplied)
+
+  const commisionTotal = useMemo(
+    () =>
+      orderForm.items.reduce((acc, item) => {
+        const product = productsData?.productsByIdentifier?.find(
+          (p) => p?.productId === item.productId
+        )
+
+        const commissionProp = product?.properties?.find(
+          (prop) => prop?.originalName === 'Comissao'
+        )
+
+        const [commission] = commissionProp?.values ?? []
+
+        if (!commission) return acc
+
+        return (
+          acc + ((item.sellingPrice ?? 0) * item.quantity * +commission) / 100
+        )
+      }, 0),
+    [orderForm.items, productsData?.productsByIdentifier]
+  )
+
+  if (!totalizers.length || !items?.length) return []
 
   const shippingTotalizer = totalizers.find((t) => t.id === 'Shipping')
   const canSeeDiscount = isSalesUser || (!isSalesUser && totalDiscount > 0)
@@ -197,6 +221,14 @@ export function useTotalizers() {
           {
             label: shippingTotalizer.name,
             value: formatPrice(shippingTotalizer.value / 100),
+          },
+        ]
+      : []),
+    ...(isSalesUser && commisionTotal
+      ? [
+          {
+            label: formatMessage(messages.commission),
+            value: formatPrice(commisionTotal / 100),
           },
         ]
       : []),

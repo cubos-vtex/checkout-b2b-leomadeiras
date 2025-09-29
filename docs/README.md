@@ -1,8 +1,8 @@
-📢 Use this project, [contribute](https://github.com/cubos-vtex/checkout-b2b) to it or open issues to help evolve it using [repository issues](https://github.com/cubos-vtex/checkout-b2b/issues).
+📢 Use this project, [contribute](https://github.com/cubos-vtex/checkout-b2b-leomadeiras) to it or open issues to help evolve it using [repository issues](https://github.com/cubos-vtex/checkout-b2b-leomadeiras/issues).
 
 # Checkout B2B
 
-[![Publish and Deploy App](https://github.com/cubos-vtex/checkout-b2b/actions/workflows/publish-and-deploy.yml/badge.svg)](https://github.com/cubos-vtex/checkout-b2b/actions/workflows/publish-and-deploy.yml)
+[![Publish and Deploy App](https://github.com/cubos-vtex/checkout-b2b-leomadeiras/actions/workflows/publish-and-deploy.yml/badge.svg)](https://github.com/cubos-vtex/checkout-b2b-leomadeiras/actions/workflows/publish-and-deploy.yml)
 
 <!-- DOCS-IGNORE:start -->
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
@@ -22,7 +22,7 @@ The **Checkout B2B** app is a custom checkout solution designed for B2B stores o
 To use the **Checkout B2B** in your store, install the app using the following command in the VTEX terminal:
 
 ```shell
-vtex install ssesandbox04.checkout-b2b@1.x
+vtex install ssesandbox04.checkout-b2b-leomadeiras@1.x
 ```
 
 After installation, the `/checkout` URL will automatically redirect to `/checkout-b2b`, taking the customer to the customized B2B checkout interface.

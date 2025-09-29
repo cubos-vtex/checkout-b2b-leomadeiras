@@ -1,7 +1,7 @@
 import type { ErrorLike, ServiceContext } from '@vtex/api'
 import { ForbiddenError, ResolverError } from '@vtex/api'
 import { SearchProduct } from '@vtex/clients'
-import { SavedCart } from 'ssesandbox04.checkout-b2b'
+import { SavedCart } from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { PaymentData } from 'vtex.checkout-graphql'
 
 import { Clients } from '../clients'

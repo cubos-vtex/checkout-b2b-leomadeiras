@@ -1,5 +1,5 @@
 query getSettings {
-  getAppSettings @context(provider: "ssesandbox04.checkout-b2b") {
+  getAppSettings @context(provider: "ssesandbox04.checkout-b2b-leomadeiras") {
     salesRepresentative
     salesManager
     salesAdmin

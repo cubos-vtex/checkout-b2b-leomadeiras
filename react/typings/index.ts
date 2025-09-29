@@ -1,4 +1,4 @@
-import type { Query as CheckoutB2BQuery } from 'ssesandbox04.checkout-b2b'
+import type { Query as CheckoutB2BQuery } from 'ssesandbox04.checkout-b2b-leomadeiras'
 import type {
   Address as OrganizationAddress,
   Query,

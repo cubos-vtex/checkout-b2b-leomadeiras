@@ -116,6 +116,7 @@ export const messages = defineMessages({
   },
   createdIn: { id: 'store/checkout.b2b.column.createdIn' },
   items: { id: 'store/checkout.b2b.column.item' },
+  commission: { id: 'store/checkout.b2b.column.commission' },
 
   searchProductsError: {
     id: 'store/checkout.b2b.search.products.error',

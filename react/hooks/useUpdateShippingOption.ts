@@ -2,7 +2,7 @@ import { useMutation } from 'react-apollo'
 import type {
   Mutation,
   MutationUpdateShippingOptionArgs,
-} from 'ssesandbox04.checkout-b2b'
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { useOrderFormCustom, useToast } from '.'
 import MUTATION_UPDATE_SHIPPING_OPTION from '../graphql/updateShippingOption.graphql'

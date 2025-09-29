@@ -9,7 +9,7 @@ mutation saveCart(
     title: $title
     additionalData: $additionalData
     parentCartId: $parentCartId
-  ) @context(provider: "ssesandbox04.checkout-b2b") {
+  ) @context(provider: "ssesandbox04.checkout-b2b-leomadeiras") {
     id
     createdIn
     lastInteractionIn

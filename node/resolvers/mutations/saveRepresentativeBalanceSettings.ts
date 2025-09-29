@@ -1,5 +1,5 @@
 import { ServiceContext } from '@vtex/api'
-import type { MutationSaveRepresentativeBalanceSettingsArgs } from 'ssesandbox04.checkout-b2b'
+import type { MutationSaveRepresentativeBalanceSettingsArgs } from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../../clients'
 import { APP_ID } from '../../utils'

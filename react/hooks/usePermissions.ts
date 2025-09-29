@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useQuery } from 'react-apollo'
-import { Query } from 'ssesandbox04.checkout-b2b'
+import { Query } from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { useOrganization } from '.'
 import GET_APP_SETTINGS from '../graphql/getAppSettings.graphql'

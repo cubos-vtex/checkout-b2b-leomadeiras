@@ -7,7 +7,7 @@ mutation saveRepresentativeBalanceSettings(
     enabled: $enabled
     openingBalance: $openingBalance
     allowNegativeBalance: $allowNegativeBalance
-  ) @context(provider: "ssesandbox04.checkout-b2b") {
+  ) @context(provider: "ssesandbox04.checkout-b2b-leomadeiras") {
     enabled
     openingBalance
     allowNegativeBalance

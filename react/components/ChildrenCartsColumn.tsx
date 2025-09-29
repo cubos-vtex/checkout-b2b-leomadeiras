@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect } from 'react'
 import { useLazyQuery } from 'react-apollo'
-import { QueryGetSavedCartsArgs, SavedCart } from 'ssesandbox04.checkout-b2b'
+import {
+  QueryGetSavedCartsArgs,
+  SavedCart,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { ButtonPlain, IconCaretDown, IconCaretRight } from 'vtex.styleguide'
 
 import { useCheckoutB2BContext } from '../CheckoutB2BContext'

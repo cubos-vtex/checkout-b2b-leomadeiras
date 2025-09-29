@@ -1,6 +1,9 @@
 import { useMutation as useGraphQLMutation } from 'react-apollo'
 import { useIntl } from 'react-intl'
-import { Mutation, MutationPlaceOrderArgs } from 'ssesandbox04.checkout-b2b'
+import {
+  Mutation,
+  MutationPlaceOrderArgs,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { useClearCart, useOrderFormCustom, useToast } from '.'
 import MUTATION_PLACE_ORDER from '../graphql/placeOrder.graphql'
