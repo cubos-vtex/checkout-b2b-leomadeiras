@@ -1,11 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useQuery } from 'react-apollo'
 import { useIntl } from 'react-intl'
 import { FormattedPrice } from 'vtex.formatted-price'
-import { Query, QueryProductsByIdentifierArgs } from 'vtex.search-graphql'
 import { ButtonWithIcon, IconCheck, IconDelete, Tooltip } from 'vtex.styleguide'
 
-import { useOrderFormCustom, usePermissions, useTotalMargin } from '.'
+import {
+  useOrderFormCustom,
+  usePermissions,
+  useProducts,
+  useTotalMargin,
+} from '.'
 import { useCheckoutB2BContext } from '../CheckoutB2BContext'
 import { CellWrapper } from '../components/CellWrapper'
 import ChildrenProductsColumn from '../components/ChildrenProductsColumn'
@@ -14,11 +17,8 @@ import { MarginProductPrice } from '../components/MarginProductPrice'
 import { QuantitySelector } from '../components/QuantitySelector'
 import { ShippingOptionItem } from '../components/ShippingOptionItem'
 import { TruncatedText } from '../components/TruncatedText'
-import GET_PRODUCTS from '../graphql/productQuery.graphql'
 import type { CustomItem, TableSchema } from '../typings'
 import { isWithoutStock, messages, normalizeString } from '../utils'
-
-type GetProductsQuery = Pick<Query, 'productsByIdentifier'>
 
 function getStrike(item: CustomItem, isRemoving?: boolean) {
   return { strike: isWithoutStock(item) || isRemoving }
@@ -48,7 +48,7 @@ export function useTableSchema({
   const { hasMargin } = useTotalMargin()
   const { orderForm } = useOrderFormCustom()
   const { formatMessage } = useIntl()
-  const { canSeeMargin } = usePermissions()
+  const { canSeeMargin, isSalesUser } = usePermissions()
 
   const {
     getSellingPrice,
@@ -136,19 +136,7 @@ export function useTableSchema({
     return data?.__group ? '--' : render(rowData)
   }
 
-  const { data: productsData } = useQuery<
-    GetProductsQuery,
-    QueryProductsByIdentifierArgs
-  >(GET_PRODUCTS, {
-    skip: !orderForm.items.length,
-    variables: {
-      field: 'id',
-      values: orderForm.items.map(
-        (orderItem) => orderItem.productId
-      ) as string[],
-    },
-  })
-
+  const { data: productsData } = useProducts()
   const productsByIdentifier = productsData?.productsByIdentifier
 
   const getMinQuantity = useCallback(
@@ -164,6 +152,32 @@ export function useTableSchema({
       )
 
       return Number(minQuantityProp?.values?.[0] ?? 1)
+    },
+    [productsByIdentifier]
+  )
+
+  const getCommission = useCallback(
+    (price: number, productId?: string | null) => {
+      const product = productsByIdentifier?.find(
+        (p) => p?.productId === productId
+      )
+
+      const commissionProp = product?.properties?.find(
+        (prop) => prop?.originalName === 'Comissao'
+      )
+
+      const [commission] = commissionProp?.values ?? []
+
+      if (!commission) {
+        return { absoluteValueFormatted: 'N/A', percentageValue: null }
+      }
+
+      return {
+        absoluteValueFormatted: (
+          <FormattedPrice value={(price * +commission) / 100} />
+        ),
+        percentageValue: `${commission}%`,
+      }
     },
     [productsByIdentifier]
   )
@@ -417,6 +431,33 @@ export function useTableSchema({
           )
         },
       },
+      ...(isSalesUser && {
+        productId: {
+          width: 100,
+          title: formatMessage(messages.commission),
+          cellRenderer({ rowData }) {
+            const discountedPrice =
+              (rowData.__group
+                ? rowData.price ?? 0
+                : getDiscountedPrice(rowData, discount)) / 100
+
+            const { absoluteValueFormatted, percentageValue } = getCommission(
+              discountedPrice,
+              rowData.productId
+            )
+
+            if (!percentageValue) return absoluteValueFormatted
+
+            return (
+              <TruncatedText
+                label={percentageValue}
+                text={absoluteValueFormatted}
+                {...getStrike(rowData, isRemoving(rowData.itemIndex))}
+              />
+            )
+          },
+        },
+      }),
       id: {
         width: 50,
         title:
