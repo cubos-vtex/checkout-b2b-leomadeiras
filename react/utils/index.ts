@@ -1,4 +1,5 @@
 import { Address, CustomData, Item, PaymentData } from 'vtex.checkout-graphql'
+import { Product } from 'vtex.search-graphql'
 import { DeliveryIds, ShippingSla } from 'vtex.store-graphql'
 
 import {
@@ -337,4 +338,24 @@ export function isSameAddress<
     (a?.state ?? '') === (b?.state ?? '') &&
     (a?.street ?? '') === (b?.street ?? '')
   )
+}
+
+export function getSpecificationValue(
+  products?: Array<Product | null> | null,
+  productId?: string | null,
+  specificationName?: string
+) {
+  const product = products?.find((p) => p?.productId === productId)
+
+  const prop = product?.properties?.find(
+    (p) => p?.originalName === specificationName
+  )
+
+  const [value] = prop?.values ?? []
+
+  return value
+}
+
+export function formatPontosLeo(value?: number | string | null) {
+  return value ? `${value} ${+value > 1 ? 'pts' : 'pt'}.` : 'N/A'
 }

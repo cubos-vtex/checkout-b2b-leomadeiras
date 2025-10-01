@@ -18,7 +18,13 @@ import { QuantitySelector } from '../components/QuantitySelector'
 import { ShippingOptionItem } from '../components/ShippingOptionItem'
 import { TruncatedText } from '../components/TruncatedText'
 import type { CustomItem, TableSchema } from '../typings'
-import { isWithoutStock, messages, normalizeString } from '../utils'
+import {
+  formatPontosLeo,
+  getSpecificationValue,
+  isWithoutStock,
+  messages,
+  normalizeString,
+} from '../utils'
 
 function getStrike(item: CustomItem, isRemoving?: boolean) {
   return { strike: isWithoutStock(item) || isRemoving }
@@ -44,7 +50,7 @@ export function useTableSchema({
   setItemsAwaitingDeletion: React.Dispatch<React.SetStateAction<CustomItem[]>>
   removeLoading: boolean
   onUpdatePrice: (id: string, newPrice: number) => void
-}): TableSchema<CustomItem> {
+}): TableSchema<CustomItem & { comission: unknown; pontosLeo: unknown }> {
   const { hasMargin } = useTotalMargin()
   const { orderForm } = useOrderFormCustom()
   const { formatMessage } = useIntl()
@@ -141,32 +147,24 @@ export function useTableSchema({
 
   const getMinQuantity = useCallback(
     (productId?: string | null) => {
-      const product = productsByIdentifier?.find(
-        (p) => p?.productId === productId
+      const minQuantity = getSpecificationValue(
+        productsByIdentifier,
+        productId,
+        'minQuantity'
       )
 
-      if (!product) return
-
-      const minQuantityProp = product.properties?.find(
-        (prop) => prop?.originalName === 'minQuantity'
-      )
-
-      return Number(minQuantityProp?.values?.[0] ?? 1)
+      return Number(minQuantity ?? 1)
     },
     [productsByIdentifier]
   )
 
   const getCommission = useCallback(
     (price: number, productId?: string | null) => {
-      const product = productsByIdentifier?.find(
-        (p) => p?.productId === productId
+      const commission = getSpecificationValue(
+        productsByIdentifier,
+        productId,
+        'Comissao'
       )
-
-      const commissionProp = product?.properties?.find(
-        (prop) => prop?.originalName === 'Comissao'
-      )
-
-      const [commission] = commissionProp?.values ?? []
 
       if (!commission) {
         return { absoluteValueFormatted: 'N/A', percentageValue: null }
@@ -178,6 +176,19 @@ export function useTableSchema({
         ),
         percentageValue: `${commission}%`,
       }
+    },
+    [productsByIdentifier]
+  )
+
+  const getPontosLeo = useCallback(
+    (productId?: string | null) => {
+      const pontosLeo = getSpecificationValue(
+        productsByIdentifier,
+        productId,
+        'Pontos Leo'
+      )
+
+      return formatPontosLeo(pontosLeo)
     },
     [productsByIdentifier]
   )
@@ -447,7 +458,7 @@ export function useTableSchema({
         },
       },
       ...(isSalesUser && {
-        productId: {
+        comission: {
           width: 100,
           title: formatMessage(messages.commission),
           cellRenderer({ rowData }) {
@@ -467,6 +478,18 @@ export function useTableSchema({
               <TruncatedText
                 label={percentageValue}
                 text={absoluteValueFormatted}
+                {...getStrike(rowData, isRemoving(rowData.itemIndex))}
+              />
+            )
+          },
+        },
+        pontosLeo: {
+          width: 100,
+          title: 'Pontos Leo',
+          cellRenderer({ rowData }) {
+            return (
+              <TruncatedText
+                text={getPontosLeo(rowData.productId)}
                 {...getStrike(rowData, isRemoving(rowData.itemIndex))}
               />
             )

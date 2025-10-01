@@ -15,7 +15,7 @@ import { useCheckoutB2BContext } from '../CheckoutB2BContext'
 import { PaymentData } from '../components/PaymentData'
 import { PONumber } from '../components/PONumber'
 import { TruncatedText } from '../components/TruncatedText'
-import { messages } from '../utils'
+import { formatPontosLeo, getSpecificationValue, messages } from '../utils'
 
 export function useTotalizers() {
   const { discountApplied } = useCheckoutB2BContext()
@@ -85,21 +85,31 @@ export function useTotalizers() {
   const commisionTotal = useMemo(
     () =>
       orderForm.items.reduce((acc, item) => {
-        const product = productsData?.productsByIdentifier?.find(
-          (p) => p?.productId === item.productId
+        const commission = getSpecificationValue(
+          productsData?.productsByIdentifier,
+          item.productId,
+          'Comissao'
         )
-
-        const commissionProp = product?.properties?.find(
-          (prop) => prop?.originalName === 'Comissao'
-        )
-
-        const [commission] = commissionProp?.values ?? []
 
         if (!commission) return acc
 
         return (
           acc + ((item.sellingPrice ?? 0) * item.quantity * +commission) / 100
         )
+      }, 0),
+    [orderForm.items, productsData?.productsByIdentifier]
+  )
+
+  const pontosLeoTotal = useMemo(
+    () =>
+      orderForm.items.reduce((acc, item) => {
+        const pontosLeo = getSpecificationValue(
+          productsData?.productsByIdentifier,
+          item.productId,
+          'Pontos Leo'
+        )
+
+        return acc + +(pontosLeo ?? 0)
       }, 0),
     [orderForm.items, productsData?.productsByIdentifier]
   )
@@ -229,6 +239,14 @@ export function useTotalizers() {
           {
             label: formatMessage(messages.commission),
             value: formatPrice(commisionTotal / 100),
+          },
+        ]
+      : []),
+    ...(isSalesUser && pontosLeoTotal
+      ? [
+          {
+            label: 'Pontos Leo',
+            value: formatPontosLeo(pontosLeoTotal),
           },
         ]
       : []),
