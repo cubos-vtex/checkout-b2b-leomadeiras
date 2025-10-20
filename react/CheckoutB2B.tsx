@@ -16,6 +16,7 @@ import {
   IconDelete,
   IconDownload,
   Layout,
+  ModalDialog,
   PageBlock,
   PageHeader,
   Slider,
@@ -42,6 +43,7 @@ import {
   useOrderFormCustom,
   useOrganization,
   usePermissions,
+  useSavedCart,
   useTableSchema,
   useToast,
   useToolbar,
@@ -51,7 +53,7 @@ import {
 import { queryClient } from './services'
 import './styles.css'
 import { CompleteOrderForm, CustomItem } from './typings'
-import { messages, SEARCH_TYPE, welcome } from './utils'
+import { getOrderFormSavedCart, messages, SEARCH_TYPE, welcome } from './utils'
 
 type MutationUpdatePrices = Pick<Mutation, 'updatePrices'>
 
@@ -74,7 +76,6 @@ function CheckoutB2B() {
   const {
     discountApplied = 0,
     setDiscountApplied,
-    setMaximumDiscount,
     subtotal,
     listedPrice,
     percentualDiscount,
@@ -83,6 +84,9 @@ function CheckoutB2B() {
     searchStore,
     setSearchStore,
     getDiscountedPrice,
+    setPending,
+    refetchCurrentSavedCart,
+    selectedCart,
   } = useCheckoutB2BContext()
 
   const [itemsAwaitingDeletion, setItemsAwaitingDeletion] = useState<
@@ -104,10 +108,29 @@ function CheckoutB2B() {
     onChangeItems: handleClearAwaitingDeletion,
   })
 
-  const { navigate } = useRuntime()
+  const { navigate, query } = useRuntime()
   const [prices, setPrices] = useState<Record<string, number>>({})
   const { formatMessage } = useIntl()
   const { items } = orderForm
+  const customAppSavedCartId = getOrderFormSavedCart(orderForm.customData)
+  const { handleUseSavedCart, loading: useCartLoading } = useSavedCart()
+
+  useEffect(() => {
+    if (
+      query?.savedCart &&
+      query.savedCart !== customAppSavedCartId &&
+      selectedCart &&
+      !useCartLoading
+    ) {
+      handleUseSavedCart(selectedCart)
+    }
+  }, [
+    customAppSavedCartId,
+    handleUseSavedCart,
+    query?.savedCart,
+    selectedCart,
+    useCartLoading,
+  ])
 
   const loading = useMemo(() => orderFormLoading || organizationLoading, [
     orderFormLoading,
@@ -116,7 +139,7 @@ function CheckoutB2B() {
 
   const showToast = useToast()
 
-  const { maximumDiscount, isSalesUser } = usePermissions()
+  const { exceedingDiscount, maximumDiscount, isSalesUser } = usePermissions()
 
   const [
     updateItemsQuantity,
@@ -131,13 +154,16 @@ function CheckoutB2B() {
     }
   }, [listedPrice, subtotal, setPercentualDiscount])
 
-  useEffect(() => {
-    setMaximumDiscount(maximumDiscount)
-  }, [maximumDiscount, setMaximumDiscount])
-
   const sliderMaxValue = useMemo(() => {
-    return Math.min(maximumDiscount, maximumDiscount - percentualDiscount)
+    return Math.round(
+      Math.min(maximumDiscount, maximumDiscount - percentualDiscount)
+    )
   }, [maximumDiscount, percentualDiscount])
+
+  const isExceedingDiscount =
+    exceedingDiscount > 0 && percentualDiscount <= maximumDiscount
+
+  const [isRequestingDiscount, setIsRequestingDiscount] = useState(false)
 
   const filteredItems = useGroupedProducts({
     items,
@@ -180,10 +206,12 @@ function CheckoutB2B() {
       setOrderForm({
         ...orderForm,
         ...updatePrices,
-        customData: orderForm.customData,
+        customData: updatePrices.customData,
       } as CompleteOrderForm)
 
+      refetchCurrentSavedCart()
       setDiscountApplied(0)
+      setIsRequestingDiscount(false)
       setIsEditing(false)
 
       showToast?.({
@@ -215,13 +243,32 @@ function CheckoutB2B() {
   const handleSavePrices = async () => {
     if (percentualDiscount > maximumDiscount) {
       showToast({
-        message: formatMessage(messages.manualPriceDiscountExceeded),
+        message: formatMessage(messages.manualPriceDiscountExceeded, {
+          value: maximumDiscount,
+        }),
       })
 
       return
     }
 
-    updateItemsPrice({ variables: { items: getUpdatedPrices() } })
+    const additionalData = JSON.stringify({
+      paymentAddress: orderForm.paymentAddress,
+      customData: orderForm.customData,
+    })
+
+    const title = formatMessage(messages.savedCartsSaveDefaultTitle, {
+      date: new Date().toLocaleString(),
+    })
+
+    setPending(true)
+
+    updateItemsPrice({
+      variables: {
+        items: getUpdatedPrices(),
+        additionalData,
+        title,
+      },
+    }).then(() => setPending(false))
   }
 
   const toggleEditMode = () => {
@@ -478,11 +525,17 @@ function CheckoutB2B() {
                 {isEditing && (
                   <Button
                     variation="primary"
-                    onClick={handleSavePrices}
+                    onClick={
+                      isExceedingDiscount
+                        ? () => setIsRequestingDiscount(true)
+                        : handleSavePrices
+                    }
                     isLoading={saving}
                     disabled={saving}
                   >
-                    {formatMessage(messages.saveManualPrice)}
+                    {isExceedingDiscount
+                      ? formatMessage(messages.requestDiscount)
+                      : formatMessage(messages.saveManualPrice)}
                   </Button>
                 )}
               </>
@@ -547,6 +600,23 @@ function CheckoutB2B() {
             )}
           </div>
         </div>
+        <ModalDialog
+          centered
+          title={formatMessage(messages.modalRequestDiscount)}
+          loading={saving}
+          confirmation={{
+            onClick: handleSavePrices,
+            label: formatMessage(messages.confirm),
+          }}
+          cancelation={{
+            onClick: () => setIsRequestingDiscount(false),
+            label: formatMessage(messages.cancel),
+          }}
+          onClose={() => setIsRequestingDiscount(false)}
+          isOpen={isRequestingDiscount}
+        >
+          <p>{formatMessage(messages.modalRequestDiscountConfirmation)}</p>
+        </ModalDialog>
       </Layout>
     </div>
   )

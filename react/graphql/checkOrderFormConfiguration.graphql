@@ -1,4 +1,4 @@
-mutation deleteCart($id: ID!) {
-  deleteCart(id: $id)
+query CheckOrderFormConfiguration {
+  checkOrderFormConfiguration
     @context(provider: "ssesandbox04.checkout-b2b-leomadeiras")
 }
