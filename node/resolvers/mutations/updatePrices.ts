@@ -1,30 +1,35 @@
 import { NotFoundError, ResolverError, ServiceContext } from '@vtex/api'
-import { MutationUpdatePricesArgs } from 'ssesandbox04.checkout-b2b-leomadeiras'
+import {
+  MutationSaveCartArgs,
+  MutationUpdatePricesArgs,
+} from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../../clients'
 import {
-  CHECKOUT_B2B_CUSTOM_APP_ID,
+  getSavedCartId,
   getSessionData,
   handleCheckoutApiError,
 } from '../../utils'
-import { saveCart } from './saveCart'
+import { getCart } from '../queries/getCart'
+import { saveCart as saveCartMutation } from './saveCart'
 
 export async function updatePrices(
   _: unknown,
   { items, title, additionalData }: MutationUpdatePricesArgs,
   context: ServiceContext<Clients>
 ) {
-  const { orderFormId } = await getSessionData(context)
+  const { orderFormId, email } = await getSessionData(context)
 
   if (!orderFormId) throw new NotFoundError('order-form-not-found')
 
-  const { checkout, checkoutExtension } = context.clients
-
-  if (!items.length) {
-    return checkout.orderForm(orderFormId)
-  }
+  const { checkoutExtension } = context.clients
 
   checkoutExtension.setOrderFormId(orderFormId)
+
+  if (!items.length) {
+    return checkoutExtension.getOrderForm()
+  }
+
   let updatedOrderForm: OrderForm | null | void = null
 
   for await (const item of items) {
@@ -39,16 +44,25 @@ export async function updatePrices(
     throw new ResolverError('error-updating-prices')
   }
 
+  async function saveCart(args: MutationSaveCartArgs) {
+    return saveCartMutation(null, args, context)
+  }
+
   if (title) {
-    const customApp = updatedOrderForm.customData?.customApps.find(
-      (app) => app.id === CHECKOUT_B2B_CUSTOM_APP_ID
-    )
+    const commonSaveCartArgs = { title, additionalData }
+    const currentOrderForm = await checkoutExtension.getOrderForm()
+    const savedCartId = getSavedCartId(currentOrderForm.customData)
+    const currentSavedCart = savedCartId
+      ? await getCart(null, { id: savedCartId }, context)
+      : null
 
-    const savedCartId = customApp?.fields?.savedCart
+    if (currentSavedCart?.email && currentSavedCart.email !== email) {
+      await saveCart({ parentCartId: savedCartId, ...commonSaveCartArgs })
+    } else {
+      await saveCart({ id: savedCartId, ...commonSaveCartArgs })
+    }
 
-    await saveCart(null, { id: savedCartId, title, additionalData }, context)
-
-    return checkout.orderForm(orderFormId)
+    return checkoutExtension.getOrderForm()
   }
 
   return updatedOrderForm

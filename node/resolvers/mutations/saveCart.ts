@@ -1,8 +1,5 @@
 import { NotFoundError, ServiceContext } from '@vtex/api'
-import type {
-  MutationSaveCartArgs,
-  SavedCart,
-} from 'ssesandbox04.checkout-b2b-leomadeiras'
+import type { MutationSaveCartArgs } from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../../clients'
 import {
@@ -31,8 +28,10 @@ export const saveCart = async (
 
   if (!orderFormId) throw new NotFoundError('order-form-not-found')
 
-  const { checkout, masterdata } = context.clients
-  const orderForm = (await checkout.orderForm(orderFormId)) as OrderForm
+  const { checkout, checkoutExtension, masterdata } = context.clients
+
+  checkoutExtension.setOrderFormId(orderFormId)
+  const orderForm = await checkoutExtension.getOrderForm()
 
   let additionalDataObject = {}
 
@@ -42,29 +41,22 @@ export const saveCart = async (
     /**/
   }
 
-  let parentSavedCart: SavedCart | null = null
   let newTitle = title
+  const parentSavedCart = parentCartId
+    ? await getCart(null, { id: parentCartId }, context)
+    : null
 
-  if (parentCartId) {
-    parentSavedCart = await getCart(null, { id: parentCartId }, context)
-
-    if (parentSavedCart) {
-      newTitle = `${parentSavedCart.title} (${
-        (parentSavedCart.childrenQuantity ?? 0) + 2
-      })`
-    }
+  if (parentSavedCart) {
+    newTitle = `${parentSavedCart.title} (${
+      (parentSavedCart.childrenQuantity ?? 0) + 2
+    })`
   }
 
-  let currentCart: SavedCart | null = null
-
-  if (id) {
-    currentCart = await getCart(null, { id }, context)
-  }
-
+  const currentCart = id ? await getCart(null, { id }, context) : null
   const percentualDiscount = getPercentualDiscount(orderForm)
   const settings = await getAppSettings(null, null, context)
   const maxDiscount = getMaxDiscountByRoleId(settings, roleId)
-  const calculatedStatus = percentualDiscount > maxDiscount ? 'pending' : 'open'
+  const status = percentualDiscount > maxDiscount ? 'pending' : 'open'
   const data = JSON.stringify({ ...orderForm, ...additionalDataObject })
 
   const { DocumentId } = await masterdata.createOrUpdatePartialDocument({
@@ -73,20 +65,15 @@ export const saveCart = async (
     fields: {
       id,
       title: currentCart?.title ?? newTitle,
-      email:
-        calculatedStatus === 'pending' ? email : currentCart?.email ?? email,
+      email,
       orderFormId,
       organizationId: currentCart?.organizationId ?? organizationId,
       costCenterId: currentCart?.costCenterId ?? costCenterId,
       data,
       parentCartId: currentCart?.parentCartId ?? parentCartId,
       requestedDiscount: percentualDiscount,
-      status:
-        currentCart?.status === 'pending' && calculatedStatus === 'open'
-          ? 'pending'
-          : calculatedStatus,
-      roleId:
-        calculatedStatus === 'pending' ? roleId : currentCart?.roleId ?? roleId,
+      status,
+      roleId,
     },
   })
 

@@ -88,6 +88,13 @@ export class CheckoutExtension extends JanusClient {
     })
   }
 
+  public async getOrderForm() {
+    return this.get<OrderForm>(this.routes.orderForm, {
+      metric: 'checkoutExtension-getOrderForm',
+      cacheable: 0,
+    })
+  }
+
   public async updateOrderFormInvoiceData(invoiceData: unknown) {
     return this.post(this.routes.invoiceData, invoiceData, {
       metric: 'checkoutExtension-updateOrderFormInvoiceData',
@@ -184,6 +191,7 @@ export class CheckoutExtension extends JanusClient {
     const itemsBasePath = `${orderFormBasePath}/items`
 
     return {
+      orderForm: orderFormBasePath,
       orderFormConfiguration: '/api/checkout/pvt/configuration/orderForm',
       invoiceData: `${attachmentsBasePath}/invoiceData`,
       shippingData: `${attachmentsBasePath}/shippingData`,

@@ -16,7 +16,7 @@ type Props = {
 export function SavedCartsListModal({
   open,
   setOpen,
-  // setOpenKanban,
+  setOpenKanban,
   onChangeItems,
 }: Props) {
   const { formatMessage } = useIntl()
@@ -35,7 +35,7 @@ export function SavedCartsListModal({
       title={formatMessage(messages.savedCartsTitle)}
       bottomBar={
         <div className="flex flex-wrap">
-          {/* <Button
+          <Button
             variation="tertiary"
             onClick={() => {
               setOpen(false)
@@ -43,7 +43,7 @@ export function SavedCartsListModal({
             }}
           >
             {formatMessage(messages.discountKanbanModal)}
-          </Button> */}
+          </Button>
 
           <Button
             variation="tertiary"

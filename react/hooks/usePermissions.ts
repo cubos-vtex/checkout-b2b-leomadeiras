@@ -59,7 +59,7 @@ export function usePermissions() {
     }
   }, [appSettings, role])
 
-  const maximumDiscount = maximumRoleDiscount // appSettings?.salesAdmin ?? 0
+  const maximumDiscount = appSettings?.salesAdmin ?? 0
 
   const totalItemsWithoutDiscount =
     orderForm.totalizers.find((t) => t.id === 'Items')?.value ?? 0

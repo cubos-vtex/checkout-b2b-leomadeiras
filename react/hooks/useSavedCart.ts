@@ -40,11 +40,11 @@ type Props = {
 
 export function useSavedCart(props?: Props) {
   const showToast = useToast()
-  const { page, navigate, query, setQuery } = useRuntime()
+  const { page, navigate, query } = useRuntime()
   const { orderForm, setOrderForm } = useOrderFormCustom()
   const {
-    pending,
-    setPending,
+    useCartLoading,
+    setUseCartLoading,
     selectedCart,
     setSelectedCart,
   } = useCheckoutB2BContext()
@@ -110,13 +110,13 @@ export function useSavedCart(props?: Props) {
 
   const loading = useMemo(
     () =>
-      pending ||
+      useCartLoading ||
       loadingClearCart ||
       loadingAddItemsToCart ||
       loadingSetManualPrice ||
       loadingUpdatePayment,
     [
-      pending,
+      useCartLoading,
       loadingAddItemsToCart,
       loadingClearCart,
       loadingSetManualPrice,
@@ -126,7 +126,6 @@ export function useSavedCart(props?: Props) {
 
   const handleUseSavedCart = async (cart: SavedCart) => {
     setSelectedCart(cart)
-    setQuery({ savedCart: cart.id })
 
     const { items, paymentData, shippingData, customData } = JSON.parse(
       cart.data ?? '{}'
@@ -138,7 +137,7 @@ export function useSavedCart(props?: Props) {
       (logisticsInfoItem) => !!logisticsInfoItem.selectedSla
     )?.selectedSla
 
-    setPending(true)
+    setUseCartLoading(true)
 
     try {
       await clearCart()
@@ -239,20 +238,17 @@ export function useSavedCart(props?: Props) {
         })
       }
 
-      setPending(false)
+      setUseCartLoading(false)
 
       if (page !== 'store.checkout-b2b') {
         navigate({
           page: 'store.checkout-b2b',
           fallbackToWindowLocation: true,
-          query: new URLSearchParams({
-            ...query,
-            savedCart: cart.id,
-          }).toString(),
+          query: new URLSearchParams(query).toString(),
         })
       }
     } catch (error) {
-      setPending(false)
+      setUseCartLoading(false)
       showToast({ message: error.message })
     }
   }
