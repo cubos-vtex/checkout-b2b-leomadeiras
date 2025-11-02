@@ -1,7 +1,13 @@
 import { EventContext } from '@vtex/api'
+import { SavedCart } from 'ssesandbox04.checkout-b2b-leomadeiras'
 
 import { Clients } from '../clients'
-import { getSavedCartId, SAVED_CART_ENTITY } from '../utils'
+import {
+  CHECKOUT_B2B_CART_COMMENT_ENTITY,
+  getSavedCartId,
+  SAVED_CART_ENTITY,
+  SCHEMA_VERSION,
+} from '../utils'
 
 export async function broadcasterOrder(context: EventContext<Clients>) {
   if (context.body.currentState !== 'order-created' || !context.body.orderId) {
@@ -13,9 +19,37 @@ export async function broadcasterOrder(context: EventContext<Clients>) {
 
   if (!savedCartId) return
 
+  const cart = await context.clients.masterdata.getDocument<
+    Pick<SavedCart, 'status' | 'updateQuantity'>
+  >({
+    dataEntity: SAVED_CART_ENTITY,
+    fields: ['status', 'updateQuantity'],
+    id: savedCartId,
+  })
+
+  let commentStatus = ''
+
   context.clients.masterdata.updatePartialDocument({
     dataEntity: SAVED_CART_ENTITY,
     id: savedCartId,
-    fields: { status: 'orderPlaced' },
+    schema: SCHEMA_VERSION,
+    fields: {
+      status: 'orderPlaced',
+      updateQuantity: (cart.updateQuantity ?? 0) + 1,
+    },
+  })
+
+  if (cart.status !== 'orderPlaced') {
+    commentStatus = `Status: ${cart.status} > orderPlaced > `
+  } else {
+    commentStatus = `Status: ${cart.status} > `
+  }
+
+  const comment = `${commentStatus}Order ID: ${context.body.orderId}`
+
+  context.clients.masterdata.createDocument({
+    dataEntity: CHECKOUT_B2B_CART_COMMENT_ENTITY,
+    schema: SCHEMA_VERSION,
+    fields: { comment, savedCartId, email: order.clientProfileData.email },
   })
 }

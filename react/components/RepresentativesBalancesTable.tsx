@@ -198,7 +198,7 @@ const RepresentativeBalancesTable = () => {
         return (
           <span>
             {rowData.__typename
-              ? new Date(rowData.createdIn).toLocaleDateString()
+              ? new Date(rowData.createdIn).toLocaleDateString(locale)
               : '---'}
           </span>
         )
@@ -211,7 +211,7 @@ const RepresentativeBalancesTable = () => {
         return (
           <span>
             {rowData.__typename
-              ? new Date(rowData.lastInteractionIn).toLocaleDateString()
+              ? new Date(rowData.lastInteractionIn).toLocaleDateString(locale)
               : '---'}
           </span>
         )

@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useQuery } from 'react-apollo'
 import { useIntl } from 'react-intl'
 import type { SavedCart } from 'ssesandbox04.checkout-b2b-leomadeiras'
 import { Item } from 'vtex.checkout-graphql'
 import { FormattedPrice } from 'vtex.formatted-price'
+import { useRuntime } from 'vtex.render-runtime'
 import {
   ButtonWithIcon,
   IconDelete,
@@ -22,6 +23,7 @@ import { messages } from '../utils'
 import { ActionCellRenderer } from './ActionCellRenderer'
 import { CellWrapper, SelectedWrapper } from './CellWrapper'
 import ChildrenCartsColumn from './ChildrenCartsColumn'
+import { SavedCartCommentBadge } from './SavedCartCommentBadge'
 import { SavedCartDiscountBadge } from './SavedCartDiscountBadge'
 import { SavedCartStatusBadge } from './SavedCartStatusBadge'
 import { TruncatedText } from './TruncatedText'
@@ -33,6 +35,7 @@ type SavedCartRow = SavedCart &
     totalItems: unknown
     paymentMethod: unknown
     action: unknown
+    comments: unknown
     loading: boolean
   }>
 
@@ -54,6 +57,7 @@ function getEmptySimpleCart(parentCartId: string): SavedCartRow {
     action: '',
     loading: true,
     status: 'open',
+    updateQuantity: 0,
   }
 }
 
@@ -64,6 +68,7 @@ type Props = {
 
 export function SavedCartsTable(props?: Props) {
   const showToast = useToast()
+  const { locale } = useRuntime().culture
   const { formatMessage } = useIntl()
   const { selectedCart } = useCheckoutB2BContext()
   const [deletingCartId, setDeletingCartId] = useState('')
@@ -138,6 +143,8 @@ export function SavedCartsTable(props?: Props) {
     [parseCartData]
   )
 
+  const rootRef = useRef<HTMLDivElement>(null)
+
   const tableSchema: TableSchema<SavedCartRow> = {
     properties: {
       expand: {
@@ -167,9 +174,11 @@ export function SavedCartsTable(props?: Props) {
           return (
             <SelectedWrapper isSelected={selectedCart?.id === rowData.id}>
               <CellWrapper isChildren={rowData.parentCartId}>
-                <Tooltip label={new Date(rowData.createdIn).toLocaleString()}>
+                <Tooltip
+                  label={new Date(rowData.createdIn).toLocaleString(locale)}
+                >
                   <span className={rowData.parentCartId ? '' : ''}>
-                    {new Date(rowData.createdIn).toLocaleDateString()}
+                    {new Date(rowData.createdIn).toLocaleDateString(locale)}
                   </span>
                 </Tooltip>
               </CellWrapper>
@@ -336,6 +345,21 @@ export function SavedCartsTable(props?: Props) {
           )
         },
       },
+      comments: {
+        title: ' ',
+        width: 50,
+        cellRenderer: function Column({ rowData }) {
+          return (
+            <SelectedWrapper isSelected={selectedCart?.id === rowData.id}>
+              <SavedCartCommentBadge
+                cart={rowData}
+                modalContainer={rootRef.current}
+                loading={rowData.loading}
+              />
+            </SelectedWrapper>
+          )
+        },
+      },
       action: {
         title: ' ',
         width: 50,
@@ -395,14 +419,16 @@ export function SavedCartsTable(props?: Props) {
   }
 
   return (
-    <Table
-      emptyStateLabel={formatMessage(messages.savedCartsUseEmpty)}
-      schema={tableSchema}
-      fullWidth
-      items={savedCarts ?? []}
-      density="high"
-      loading={loading}
-      onRowClick={() => {}}
-    />
+    <div ref={rootRef}>
+      <Table
+        emptyStateLabel={formatMessage(messages.savedCartsUseEmpty)}
+        schema={tableSchema}
+        fullWidth
+        items={savedCarts ?? []}
+        density="high"
+        loading={loading}
+        onRowClick={() => {}}
+      />
+    </div>
   )
 }

@@ -20,6 +20,8 @@ type ChildrenCartsColumnProps = {
   >
 }
 
+export { GET_CHILDREN_CARTS }
+
 export default function ChildrenCartsColumn({
   cart,
   expandedCarts,

@@ -108,7 +108,7 @@ function CheckoutB2B() {
     onChangeItems: handleClearAwaitingDeletion,
   })
 
-  const { navigate, query } = useRuntime()
+  const { navigate, query, culture } = useRuntime()
   const [prices, setPrices] = useState<Record<string, number>>({})
   const { formatMessage } = useIntl()
   const { items } = orderForm
@@ -258,7 +258,7 @@ function CheckoutB2B() {
     })
 
     const title = formatMessage(messages.savedCartsSaveDefaultTitle, {
-      date: new Date().toLocaleString(),
+      date: new Date().toLocaleString(culture.locale),
     })
 
     setPending(true)

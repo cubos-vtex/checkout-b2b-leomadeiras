@@ -8,7 +8,7 @@ import {
   SavedCart,
   SavedCartStatus,
 } from 'ssesandbox04.checkout-b2b-leomadeiras'
-import { EXPERIMENTAL_Modal as Modal, Spinner } from 'vtex.styleguide'
+import { Button, EXPERIMENTAL_Modal as Modal, Spinner } from 'vtex.styleguide'
 
 import { useCheckoutB2BContext } from '../CheckoutB2BContext'
 import GET_ALL_SAVED_CARTS from '../graphql/getAllSavedCarts.graphql'
@@ -23,10 +23,16 @@ type MutationUpdateSavedCartStatus = Pick<Mutation, 'updateSavedCartStatus'>
 type Props = {
   open: boolean
   setOpen: (value: boolean) => void
+  setOpenTable: (value: boolean) => void
   onChangeItems: () => void
 }
 
-export function DiscountApprovalModal({ open, setOpen, onChangeItems }: Props) {
+export function DiscountApprovalModal({
+  open,
+  setOpen,
+  setOpenTable,
+  onChangeItems,
+}: Props) {
   const { formatMessage } = useIntl()
   const showToast = useToast()
   const { refetchCurrentSavedCart } = useCheckoutB2BContext()
@@ -74,6 +80,8 @@ export function DiscountApprovalModal({ open, setOpen, onChangeItems }: Props) {
     data?.getSavedCarts ??
     []
 
+  const ref = useRef<HTMLDivElement>(null)
+
   return (
     <Modal
       isOpen={open}
@@ -83,23 +91,37 @@ export function DiscountApprovalModal({ open, setOpen, onChangeItems }: Props) {
       showBottomBarBorder={false}
       size="extralarge"
       style={{ minHeight: '50vh' }}
-    >
-      {networkStatus !== 1 ? (
-        <DiscountApprovalKanban
-          requests={carts}
-          onChangeCartStatus={handleCartStatus}
-          isLoadingChangeCartStatus={updateCartStatusLoading}
-          onUseCart={handleCloseModal}
-          onChangeItems={onChangeItems}
-        />
-      ) : (
-        <div
-          className="flex justify-center items-center"
-          style={{ minHeight: '50vh' }}
+      bottomBar={
+        <Button
+          variation="tertiary"
+          onClick={() => {
+            setOpen(false)
+            setOpenTable(true)
+          }}
         >
-          <Spinner />
-        </div>
-      )}
+          {formatMessage(messages.openTable)}
+        </Button>
+      }
+    >
+      <div ref={ref}>
+        {networkStatus !== 1 && ref.current ? (
+          <DiscountApprovalKanban
+            requests={carts}
+            onChangeCartStatus={handleCartStatus}
+            isLoadingChangeCartStatus={updateCartStatusLoading}
+            onUseCart={handleCloseModal}
+            onChangeItems={onChangeItems}
+            modalContainer={ref.current}
+          />
+        ) : (
+          <div
+            className="flex justify-center items-center"
+            style={{ minHeight: '50vh' }}
+          >
+            <Spinner />
+          </div>
+        )}
+      </div>
     </Modal>
   )
 }

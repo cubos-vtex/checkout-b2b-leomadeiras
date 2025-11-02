@@ -4,6 +4,7 @@ import type { MutationSaveCartArgs } from 'ssesandbox04.checkout-b2b-leomadeiras
 import { Clients } from '../../clients'
 import {
   CHECKOUT_B2B_CUSTOM_APP_ID,
+  createSavedCartComment,
   getMaxDiscountByRoleId,
   getPercentualDiscount,
   getSessionData,
@@ -76,6 +77,28 @@ export const saveCart = async (
       roleId,
     },
   })
+
+  if (currentCart && currentCart.status !== status) {
+    const comment = `Status: ${currentCart.status} > ${status}.`
+
+    await createSavedCartComment(context, {
+      comment,
+      savedCartId: currentCart.id,
+      email,
+      currentUpdateQuantity: currentCart.updateQuantity,
+    })
+  }
+
+  if (!currentCart) {
+    const comment = `Status: ${status}.`
+
+    await createSavedCartComment(context, {
+      comment,
+      savedCartId: DocumentId,
+      email,
+      currentUpdateQuantity: 0,
+    })
+  }
 
   const savedCartPromises = [
     checkout.setSingleCustomData(orderFormId, {
